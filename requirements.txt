@@ -1,0 +1,6 @@
+pytest
+pygcloud
+python-dotenv
+pyyaml
+croniter
+fire

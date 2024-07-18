@@ -1,0 +1,25 @@
+{
+  "lockfile_version": "1",
+  "packages": {
+    "graphviz@latest": {
+      "last_modified": "2024-07-07T07:43:47Z",
+      "resolved": "github:NixOS/nixpkgs/b60793b86201040d9dee019a05089a9150d08b5b#graphviz",
+      "source": "devbox-search",
+      "version": "10.0.1",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/9pp3bn97ahrjvnycb7hl6ypf1gbnsnp2-graphviz-10.0.1"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/5x1rmz1d492wyanrbzkp5mwdm69wn33f-graphviz-10.0.1"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/61yjifwb1zmp122skq1g3iypc1sm9bpy-graphviz-10.0.1"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/bdljw8m0mm51m8080r17mygdqjvz1kyv-graphviz-10.0.1"
+        }
+      }
+    }
+  }
+}
