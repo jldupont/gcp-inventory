@@ -20,8 +20,7 @@ test:
 
 deploy:
 	@echo "Starting deployment of the Cloud Run Job... (if applicable)"
-	@echo ${@:2}
-	@src/gcp_inventory.py deploy ${@:2}
+	@src/gcp_inventory.py deploy
 	# Ensure GCS bucket exists, create if not
 	# Ensure Service Account for Cloud Run Job exists
 	# Ensure config file exists and is valid

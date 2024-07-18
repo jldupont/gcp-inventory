@@ -39,7 +39,8 @@ def test_parse_config(sample_config):
 def test_invalid_config():
     with pytest.raises(ValueError):
         services = {"BackendService": {"enabled": True, "extra": 666}}
-        Config(Services=services)
+
+        Config(Services=services, JobRegion="")
 
     with pytest.raises(ValueError):
-        Config(Services={}, Regions=None)
+        Config(Services={}, Regions=None, JobRegion="")

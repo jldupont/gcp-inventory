@@ -23,6 +23,9 @@ Schedule: 0 */1 * * *
 # the Cloud Run Job will be configured with.
 # ServiceAccountEmail: --your-service-account-email-here-
 
+# The region where to run the gcp-inventory Cloud Run Job
+JobRegion: northamerica-northeast1
+
 # Each key in Services comes from a class name
 # in a module located in pygcloud.gcp.services
 Services:
