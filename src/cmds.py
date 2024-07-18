@@ -65,7 +65,7 @@ def get_cmd_cloud_run_job_create_or_update(config: Config,
     return GCloud("run", "jobs", action, "gcp-inventory",
                   "--project", config.ProjectId,
                   "--region", config.JobRegion,
-                  "--source", ".",
+                  "--image", "jldupont/gcp-inventory",
                   "--schedule", config.Schedule,
                   OptionalParam("--service-account",
                                 config.ServiceAccountEmail),
@@ -79,4 +79,3 @@ def deploy_cloud_run_job(config: Config, already_exists: bool) -> Result:
     cmd = get_cmd_cloud_run_job_create_or_update(config, already_exists)
     result: Result = cmd()
     return result
-
