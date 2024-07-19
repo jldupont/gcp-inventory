@@ -2,7 +2,8 @@
 @author: jldupont
 """
 import pytest
-from models import Config, OptionalParam
+from pygcloud.models import OptionalParam
+from models import Config
 
 
 @pytest.fixture
