@@ -11,13 +11,15 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
 
     steps:
     - name: Checkout from repo
       uses: actions/checkout@v4
-
-    #- name: Build the Docker image
-    #  run: docker build . --file Dockerfile --tag jldupont/gcp-inventory:$(date +%s)
 
     - name: Log in to Docker Hub
       uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
