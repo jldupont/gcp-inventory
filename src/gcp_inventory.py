@@ -91,6 +91,9 @@ class Commands:
         if not result.success:
             abort(f"Failed to {action} Cloud Scheduler")
 
+        info("! Done")
+
+
 if __name__ == "__main__":
     import fire
     fire.Fire(Commands)

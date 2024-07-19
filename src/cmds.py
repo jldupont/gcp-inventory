@@ -84,7 +84,7 @@ def get_cmd_scheduler_for_cloud_run_job_describe(config: Config) -> GCloud:
     return GCloud("scheduler", "jobs", "describe", "gcp-inventory",
                   "--project", config.ProjectId,
                   "--location", config.JobRegion,
-                  "--format", "json"
+                  "--format", "json",
                   cmd="gcloud",
                   exit_on_error=False)
 

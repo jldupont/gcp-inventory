@@ -14,9 +14,29 @@ There is a capability to filter-out information to any granularity deemed requir
 
 # Usage
 
+## Planning
+
+Usually, an SDLC process for governing application lifecycle is leveraged. In this context, it is best practice to have multiple environments (aka `projects`) in a `workload` (i.e. collection of projects).
+
+From the above, it is reasonable one would want to use `gcp-inventory` on all projects in the workload. Thus, the following steps are assumed:
+
+* Choose a project where the target GCS bucket will provisioned (e.g. the '-src' project along with source code)
+* Further to the previous point, consider using a separate project if you plan to expose the bucket to a third party. This step is not strictly required: it really depends on your risk appetite. Properly securing a GCS bucket is fairly straightforward now.
+
+## Preparation for automation
+
 * Clone this repository
 * Execute `make install`
 * Edit the configuration of the file `config.yaml`
+
+## CI/CD Setup
+
+The following steps are assumed to be executed in an environment either in the target project or in one that where the target project is accessible.
+
+* Ensure the target project id is configured correctly in the environment variables (i.e. either `PROJECT_ID`, `_PROJECT_ID` or `PROJECT`)
+* Ensure that the Service Account for the Cloud Run Job exists and has sufficient rights against the list of services in scope
+* Ensure that said Service Account has also `list` and `create` permissions to the target bucket
+* Ensure that the file `config.yaml` in the same directory as the makefile
 * Execute `make deploy`
 
 ## Deployment dependencies
