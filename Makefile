@@ -1,6 +1,7 @@
 #
 # @author: jldupont
 #
+SHELL := /bin/bash
 RED=\033[1;31m
 GREEN=\033[1;32m
 NC=\033[0m
@@ -10,22 +11,24 @@ install: requirements.txt
 	@echo -e "${GREEN}NOTE:${NC} make sure you have Google Cloud SDK installed with 'gcloud'"
 	@pip install -r requirements.txt 1> /dev/null
 	
-	# TODO check if config.yaml already exists before overwritting install
 	# TODO check compatibility of existing config.yaml file & describe the changes
 
-	@echo "Copying default template to 'config.yaml'"
-	@echo "Modify this file to customize the inventory"
-	@cp templates/all.yaml ./config.yaml
-	
+	@./maybe_prepare_config.sh
+
 test:
 	@pytest -v src/
 
 deploy:
-	@echo "Starting deployment of the Cloud Run Job... (if applicable)"
+	@echo "Starting deployment of the Cloud Run Job (creation or update)"
 	@src/gcp_inventory.py deploy
-	# Ensure GCS bucket exists, create if not
-	# Ensure Service Account for Cloud Run Job exists
-	# Ensure config file exists and is valid
 
 help:
 	@src/gcp_inventory.py --help
+
+commit:
+	@git add .
+	@git commit -m "step"
+	@git push
+
+push:
+	@git push

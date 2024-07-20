@@ -9,6 +9,7 @@ Regions:
 # The script will attempt to create the bucket if it does not exist.
 # If the bucket ultimately does not exist, the script will fail.
 TargetBucket: mock-gcp-inventory
+TargetBucketProject: mock-project
 
 # The schedule in cron format
 # e.g. below is every hour
@@ -50,5 +51,8 @@ Services:
   CloudRun:
     enabled: True
 
-  #CloudScheduler:
-  #  enabled: True
+  CloudScheduler:
+    enabled: True
+
+  TasksQueues:
+    enabled: True

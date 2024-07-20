@@ -12,6 +12,11 @@ The inventory can be used in different ways, e.g.:
 The standard setup is totally under the control of the user.
 There is a capability to filter-out information to any granularity deemed required.
 
+# Non-goals
+
+    1. This tool is not meant to perform near/real-time infrastructure/services policying.
+    2. The inventory process runs asynchronously from other processes that might change the inventory. No attempt is made to synchronise across such processes.
+
 # Usage
 
 ## Planning
@@ -22,6 +27,7 @@ From the above, it is reasonable one would want to use `gcp-inventory` on all pr
 
 * Choose a project where the target GCS bucket will provisioned (e.g. the '-src' project along with source code)
 * Further to the previous point, consider using a separate project if you plan to expose the bucket to a third party. This step is not strictly required: it really depends on your risk appetite. Properly securing a GCS bucket is fairly straightforward now.
+* Consider using [lifecycle management](https://cloud.google.com/storage/docs/lifecycle) on the bucket objects
 
 ## Preparation for automation
 
@@ -57,11 +63,25 @@ Details of the configuration options are contained in the `config.yaml` file dir
 
 # Output files
 
+## Strategy
+
+* Produce one snapshot per execution of the Cloud Run Job `gcp-inventory`
+* A `snapshot` consists of
+  * One file object signaling the end of the snapshot execution `{TIMESTAMP}_snapshot.json`
+  * One file object per service class `{SERVICE_CLASS}/{TIMESTAMP}_inventory.json`
+* No locking
+
+## Organization
+
 The files generated are uploaded to a specified Google Cloud Storage bucket.
 
 Organization in the GCS bucket is as follows:
 
-* 
+    {PROJECT_ID}/{TIMESTAMP}_snapshot.json
+    {PROJECT_ID}/{SERVICE_CLASS}/{TIMESTAMP}_inventory.json
+
+The `TIMESTAMP` is obtained at the start of the inventory (aka snapshot) process. Thus, all files prefixed with the same `TIMESTAMP` are issued from the same execution of the Cloud Run Job `gcp-inventory`.
+
 
 # Cloud Run Jobs
 
@@ -69,20 +89,29 @@ Organization in the GCS bucket is as follows:
 
 # Architecture
 
-In short, a script located in a Docker container executes a number of `gcloud $service list` commands in order to list the inventory of resources. Each entry is processed in order to remove sensitive information e.g. environment variables in Cloud Run services.
+In short, a script located in a Docker container executes a number of `gcloud $service list` commands in order to list the inventory of services / resources. Each entry is processed in order to remove sensitive information e.g. environment variables in Cloud Run services.
 
 ## Solution
 
 The solution leverages the python package [pygcloud](https://github.com/jldupont/pygcloud/).
 
 1. The script verifies if a `configuration file` is present in the configured path
-1. The script reads the list of enabled services in the target project if no configuration file is present
 1. For each `service`, the script verifies if a `handler` is available
 1. Each `handler`, lists the service instances in the target project in JSON representation
 1. Then the `handler` instantiates a `pygcloud` class object associated with the service instance
 1. Finally, each `pygcloud` object is written, in JSON format, to a file in the configured path
 
 
-# Dependencies
+# Dependencies (major ones)
 
 * [pygcloud](https://github.com/jldupont/pygcloud/)
+* [Croniter](https://pypi.org/project/croniter/)
+* [Fire](https://pypi.org/project/fire/)
+
+# References
+
+* [GCS Bucket Object listing](https://cloud.google.com/storage/docs/json_api/v1/objects/list#list-objects-and-prefixes-using-glob)
+
+# Future Enhancements
+
+* Check IAM permissions on service account ahead of deploy / inventory processes
