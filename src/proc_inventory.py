@@ -7,7 +7,7 @@ import logging
 from typing import List
 from pygcloud.models import GCPService
 from pygcloud.gcp.models import Spec
-from models import Config
+from models import Config, Service
 from utils import safe_get_config
 from pygcloud.gcp.catalog import lookup
 from cmds import get_inventory
@@ -63,7 +63,12 @@ def run(path: str = 'config.yaml'):
     info(f"> Inventoring project: {config.ProjectId}")
     info(f"> Bucket: gs://{bucket} in project '{bucket_project}'")
 
-    for service_class_name in services:
+    service: Service
+    for service_class_name, service in services.items():
+
+        if not service.enabled:
+            info(f"! Skipping disabled {service_class_name}")
+            continue
 
         service_class: GCPService = lookup(service_class_name)
         if not service_class:
