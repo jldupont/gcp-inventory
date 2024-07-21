@@ -77,10 +77,18 @@ The files generated are uploaded to a specified Google Cloud Storage bucket.
 
 Organization in the GCS bucket is as follows:
 
-    {PROJECT_ID}/{TIMESTAMP}_snapshot.json
+    {PROJECT_ID}/{TIMESTAMP}_config.json
     {PROJECT_ID}/{SERVICE_CLASS}/{TIMESTAMP}_inventory.json
 
 The `TIMESTAMP` is obtained at the start of the inventory (aka snapshot) process. Thus, all files prefixed with the same `TIMESTAMP` are issued from the same execution of the Cloud Run Job `gcp-inventory`.
+
+The `_config.json` contains the configuration is used to perform the inventory snapshot. The availability of this file also signals the end of the snapshot process.
+
+## Timestamp
+
+The format used is loosely based on ISO8601 with UTC as timezone: the "T" and "Z" characters are omitted and all other separators are by '-'. Example:
+
+    2024-07-20-10-17-53
 
 
 # Cloud Run Jobs
@@ -111,6 +119,7 @@ The solution leverages the python package [pygcloud](https://github.com/jldupont
 # References
 
 * [GCS Bucket Object listing](https://cloud.google.com/storage/docs/json_api/v1/objects/list#list-objects-and-prefixes-using-glob)
+* [GCS naming](https://cloud.google.com/storage/docs/objects#naming)
 
 # Future Enhancements
 

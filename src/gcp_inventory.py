@@ -29,7 +29,10 @@ class Commands:
         --loglevel: loglevel to use (DEBUG, INFO, WARNING, ERROR)
         """
         logger.set_params(loglevel)
-        run_deploy(path)
+        try:
+            run_deploy(path)
+        except KeyboardInterrupt:
+            pass
 
     def inventory(self, path: str = 'config.yaml', loglevel: str = 'INFO'):
         """
@@ -39,9 +42,12 @@ class Commands:
         --loglevel: loglevel to use (DEBUG, INFO, WARNING, ERROR)
         """
         logger.set_params(loglevel)
-        run_inventory(path)
+        try:
+            run_inventory(path)
+        except KeyboardInterrupt:
+            pass
 
 
 if __name__ == "__main__":
-    import fire
+    import fire  # type: ignore
     fire.Fire(Commands)

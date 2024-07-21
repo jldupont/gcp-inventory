@@ -16,6 +16,15 @@ def test_config(config):
         print(config.ServiceAccountEmail)
 
 
+def test_config_to_json(config):
+    import dataclasses
+    import json
+    dic = dataclasses.asdict(config)
+    json_str = json.dumps(dic, indent=4)
+    js = json.loads(json_str)
+    assert js["JobRegion"] == "jobregion", print(js)
+
+
 def test_optional_param(config):
 
     osa = OptionalParam("--sa", config.ServiceAccountEmail)

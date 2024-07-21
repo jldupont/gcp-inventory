@@ -5,7 +5,13 @@ import os
 import sys
 import yaml
 import logging
+from typing import List
 from models import Config
+from pygcloud.gcp.models import Spec  # type: ignore
+from pygcloud.utils import FlexJSONEncoder  # type: ignore
+
+
+info = logging.info
 
 error = logging.error
 
@@ -85,3 +91,18 @@ def safe_get_config(path: str) -> Config:
         error(f"Error attempting to get configuration: {e}")
         sys.exit(1)
     return config
+
+
+def get_now_timestamp():
+    from datetime import datetime, timezone
+
+    utc_now = datetime.now(timezone.utc)
+    formatted_datetime = utc_now.strftime("%Y-%m-%d-%H-%M-%S")
+
+    return formatted_datetime
+
+
+def spec_list_to_json(spec_list: List[Spec]) -> str:
+    import json
+    dics = [spec.to_dict() for spec in spec_list]
+    return json.dumps(dics, cls=FlexJSONEncoder)

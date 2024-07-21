@@ -37,7 +37,12 @@ def get_inventory(project: str,
 
     spec_class: Spec = service_class.SPEC_CLASS  # type: ignore
 
-    specs: List[Spec] = spec_class.from_json_list(result.message)
+    try:
+        specs: List[Spec] = spec_class.from_json_list(result.message)
+    except Exception as e:
+        error("! Failed to parse entries related to "
+              f"{service_class.__name__}: {e}")
+        return []
 
     return specs
 
