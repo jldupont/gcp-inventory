@@ -1,7 +1,7 @@
 """
 @author: jldupont
 """
-from typing import List, Dict
+from typing import List, Dict, Union
 from dataclasses import dataclass, field, asdict  # type: ignore
 from croniter import croniter  # type: ignore
 
@@ -24,13 +24,13 @@ class Service(_Base):
 class Config(_Base):
     Services: Dict[str, Service]
     JobRegion: str
-    ProjectNumber: int = None
+    ProjectNumber: Union[int, None] = field(default=None)
     ProjectId: str = field(default="PROJECT_NOT_SET")
     Regions: List[str] = field(default_factory=list)
     TargetBucket: str = field(default_factory=str)
     TargetBucketProject: str = field(default_factory=str)
     Schedule: str = field(default_factory=str)
-    ServiceAccountEmail: str = None
+    ServiceAccountEmail: Union[str, None] = field(default=None)
 
     def __post_init__(self):
 

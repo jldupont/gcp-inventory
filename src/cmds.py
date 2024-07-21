@@ -191,3 +191,20 @@ def deploy_cloud_run_scheduler(config: Config, exists_already: bool) -> Result:
                                                            exists_already)
     result: Result = cmd()
     return result
+
+
+def upload_path_recursive(target_project: str,
+                          target_bucket: str,
+                          file_path: str):
+    """
+    Upload a local file to a specific GCS bucket object path
+    """
+    cmd = GCloud("storage", "cp", file_path,
+                 f"gs://{target_bucket}",
+                 "--project", target_project,
+                 "--recursive",
+                 "--format", "json",
+                 cmd="gcloud",
+                 exit_on_error=False)
+    result: Result = cmd()
+    return result

@@ -10,8 +10,8 @@ from pygcloud.gcp.models import Spec     # type: ignore
 from pygcloud.gcp.catalog import lookup  # type: ignore
 from models import Config, Service
 from utils import safe_get_config, get_now_timestamp
-from cmds import get_inventory
-from store import store_spec_list, store_config
+from cmds import get_inventory, upload_path_recursive
+from store import store_spec_list, store_config, get_temp_dir
 
 
 info = logging.info
@@ -91,12 +91,25 @@ def run(path: str = 'config.yaml'):
             store_spec_list(config, ts, service_class_name, specs)
         except Exception as e:
             error(f"! Failed to store spec list: {e}")
-            print(specs)
+            continue
+
+        info(f"> Done with {service_class_name}")
 
     try:
         store_config(config, ts)
+        info("> Done with config")
     except Exception as e:
         error(f"! Failed to store config: {e}")
         info(f"> Objects related to the timestamp({ts}) will be dangling")
+
+    info(f"> Uploading files to bucket: gs//{config.TargetBucket}")
+
+    tempdir = get_temp_dir()
+    result = upload_path_recursive(config.TargetBucketProject,
+                                   config.TargetBucket,
+                                   f"{tempdir}/{config.ProjectId}")
+
+    if not result.success:
+        error(f"! Failed to upload files to bucket: {result.message}")
 
     info("> Done")
