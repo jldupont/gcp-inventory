@@ -77,8 +77,8 @@ The files generated are uploaded to a specified Google Cloud Storage bucket.
 
 Organization in the GCS bucket is as follows:
 
-    {PROJECT_ID}/{TIMESTAMP}_config.json
-    {PROJECT_ID}/{SERVICE_CLASS}/{TIMESTAMP}_inventory.json
+    {PROJECT_ID}/{TIMESTAMP}/config.json
+    {PROJECT_ID}/{TIMESTAMP}/{SERVICE_CLASS}.json
 
 The `TIMESTAMP` is obtained at the start of the inventory (aka snapshot) process. Thus, all files prefixed with the same `TIMESTAMP` are issued from the same execution of the Cloud Run Job `gcp-inventory`.
 

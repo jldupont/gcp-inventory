@@ -29,11 +29,9 @@ def store_spec_list(config: Config,
                     ts: str,
                     service_class_name: str,
                     specs: List[Spec]):
-    """
-    gs://bucket/{SERVICE_CLASS}/{TIMESTAMP}_inventory.json
-    """
-    base_path = f"{config.ProjectId}/{service_class_name}"
-    path = f"{TEMPDIR}/{base_path}/{ts}_inventory.json"
+
+    base_path = f"{config.ProjectId}/{ts}"
+    path = f"{TEMPDIR}/{base_path}/{service_class_name}.json"
     liste: str = spec_list_to_json(specs)
 
     mkdir(f"{TEMPDIR}/{base_path}")
@@ -45,11 +43,9 @@ def store_spec_list(config: Config,
 
 
 def store_config(config: Config, ts: str):
-    """
-    gs://bucket/{TIMESTAMP}_config.json
-    """
-    base_path = f"{config.ProjectId}"
-    path = f"{TEMPDIR}/{base_path}/{ts}_config.json"
+
+    base_path = f"{config.ProjectId}/{ts}"
+    path = f"{TEMPDIR}/{base_path}/config.json"
     obj_str: str = config.to_json()
 
     mkdir(f"{TEMPDIR}/{base_path}")
