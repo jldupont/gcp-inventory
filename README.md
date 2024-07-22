@@ -17,6 +17,35 @@ There is a capability to filter-out information to any granularity deemed requir
     1. This tool is not meant to perform near/real-time infrastructure/services policying.
     2. The inventory process runs asynchronously from other processes that might change the inventory. No attempt is made to synchronise across such processes.
 
+# Use-cases
+
+1. Single project
+1. Multiple projects (unrelated to one another)
+1. Multiple projects part of a single workload
+
+# Deployment options
+
+1. Inside the target project
+1. Outside the target project(s)
+
+# Some challenges
+
+1. Balancing configuration complexity and service catalog evolution
+
+The catalog of supported services both on GCP and this project will expand over time. Considering most projects will only consume a subset of service classes, the challenge is devise sensible defaults for the configuration.
+
+* On one hand, enabling by default all supported service classes will lead to ever increasing inventory execution time
+* On the other hand, requiring explicitly configuring the target service classes goes against the essence of automation
+* There is of course the option to explicitly disable specific service classes.
+* And finally there is the option to "auto-detect" service classes that are currently used.
+
+2. Listing some services requires specifying a location
+
+It is currently not possible to list the locations being used in a project at the moment.
+
+Considering the ever growing list of locations and the time it takes to list on a per service/location basis, it is more desirable to specify the location(s) in scope through configuration.
+
+
 # Usage
 
 ## Planning

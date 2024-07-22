@@ -6,13 +6,13 @@ import sys
 import yaml
 import logging
 from typing import List
+from dataclasses import fields
 from models import Config
 from pygcloud.gcp.models import Spec  # type: ignore
 from pygcloud.utils import FlexJSONEncoder  # type: ignore
 
 
 info = logging.info
-
 error = logging.error
 
 
@@ -27,9 +27,21 @@ try:
 except Exception:
     pass
 
-PROJECT_ID = os.environ.get("_PROJECT_ID", False) or \
-             os.environ.get("PROJECT_ID", False) or \
-             os.environ.get("PROJECT", False)
+PROJECT_ID = os.environ.get("_PROJECT_ID", None) or \
+             os.environ.get("PROJECT_ID", None) or \
+             os.environ.get("PROJECTID", None) or \
+             os.environ.get("PROJECT", None)
+
+
+def get_config_from_environment():
+    """
+    Get the configuration from the environment variables
+    """
+    _fields = fields(Config)
+    dic = {
+        field.name: os.environ.get(field.name.upper(), None)
+        for field in _fields}
+    return Config(**dic)
 
 
 def get_config(path: str = None, yaml_string: str = None) -> Config:
@@ -43,7 +55,7 @@ def get_config(path: str = None, yaml_string: str = None) -> Config:
 
     project_id_from_config_file = raw_config.get("ProjectId", None)
 
-    project_id = PROJECT_ID if PROJECT_ID is not False \
+    project_id = PROJECT_ID if PROJECT_ID is not None \
         else project_id_from_config_file
 
     raw_config["ProjectId"] = project_id

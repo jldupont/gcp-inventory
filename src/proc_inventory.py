@@ -6,37 +6,42 @@ The actual task that performs the inventory of the active project
 import logging
 from typing import List, Union
 from pygcloud.models import GCPService   # type: ignore
-from pygcloud.gcp.models import Spec     # type: ignore
-from pygcloud.gcp.catalog import lookup  # type: ignore
-from models import Config, Service
-from utils import safe_get_config, get_now_timestamp
+from pygcloud.gcp.models import Spec, ServiceDescription  # type: ignore
+from pygcloud.gcp.catalog import \
+    get_service_classes_from_services_list  # type: ignore
+from pygcloud.cmds import cmd_retrieve_enabled_services   # type: ignore
+from models import Config
+from utils import get_config_from_environment, get_now_timestamp
 from cmds import get_inventory, upload_path_recursive
 from store import store_spec_list, store_config, get_temp_dir
 
 
+debug = logging.debug
 info = logging.info
 error = logging.error
 
 
 def get_listings(project: str,
                  service: GCPService,
-                 region: Union[str, None] = None) -> List[Spec]:
+                 location: Union[str, None] = None) -> List[Spec]:
 
     info(f"* Retrieving {service.__name__} instance(s) "
-         f"from region({region or 'all'}) ...")
-    specs: List[Spec] = get_inventory(project, service, region)
+         f"from location({location or 'all'}) ...")
+    specs: List[Spec] = get_inventory(project, service, location)
     return specs
 
 
 def list_with_locations(project: str,
                         service: GCPService,
-                        regions: List[str]) -> List[Spec]:
+                        locations: str) -> List[Spec]:
 
     all_entries: List[Spec] = []
-    region: str
 
-    for region in regions:
-        entries = get_listings(project, service, region)
+    location_list: List[str] = locations.split(",")
+    location: str
+
+    for location in location_list:
+        entries = get_listings(project, service, location)
         all_entries.extend(entries)
 
     return all_entries
@@ -49,41 +54,41 @@ def list_no_location(project: str,
 
 def run(path: str = 'config.yaml'):
 
-    info(f"> Configuration from : {path}")
-    config: Config = safe_get_config(path)
+    config: Config = get_config_from_environment()
+    info(f"> Configuration: {config}")
+
+    project: str = config.TargetProjectId
+
+    liste: List[ServiceDescription] = \
+        cmd_retrieve_enabled_services(project)
+
+    debug(f"> List of services enabled: {liste}")
+
+    services: List[GCPService] = \
+        get_service_classes_from_services_list(liste)
+
+    info(f"> List of supported services in the project: {services}")
 
     bucket = config.TargetBucket
     bucket_project = config.TargetBucketProject
+    locations: List[str] = config.TargetLocations
 
-    project = config.ProjectId
-    services = config.Services
-    regions = config.Regions
-
-    info(f"> Inventoring project: {config.ProjectId}")
+    info(f"> Inventoring project: {config.TargetProjectId}")
     info(f"> Bucket: gs://{bucket} in project '{bucket_project}'")
 
     ts = get_now_timestamp()
     info(f"> Using the following timestamp: {ts}")
 
-    service: Service
-    for service_class_name, service in services.items():
+    for service_class in services:
 
-        if not service.enabled:
-            info(f"! Skipping disabled {service_class_name}")
-            continue
-
-        service_class: GCPService = lookup(service_class_name)
-        if not service_class:
-            error(f"Service class '{service_class_name}' "
-                  "not found... skipping")
-            continue
+        service_class_name = service_class.__name__
 
         requires_location = service_class.LISTING_REQUIRES_LOCATION
 
         specs: List[Spec] = []
 
         if requires_location:
-            specs = list_with_locations(project, service_class, regions)
+            specs = list_with_locations(project, service_class, locations)
         else:
             specs = list_no_location(project, service_class)
 
@@ -107,7 +112,7 @@ def run(path: str = 'config.yaml'):
     tempdir = get_temp_dir()
     result = upload_path_recursive(config.TargetBucketProject,
                                    config.TargetBucket,
-                                   f"{tempdir}/{config.ProjectId}")
+                                   f"{tempdir}/{config.TargetProjectId}")
 
     if not result.success:
         error(f"! Failed to upload files to bucket: {result.message}")

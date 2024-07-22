@@ -8,7 +8,7 @@ from models import Config
 
 @pytest.fixture
 def config():
-    return Config(Services={}, Schedule="* * * * *", JobRegion="jobregion")
+    return Config(Schedule="* * * * *", JobRegion="jobregion")
 
 
 def test_config(config):

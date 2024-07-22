@@ -1,6 +1,8 @@
 #
 # @author: jldupont
 #
+RELEASE=0.0.2
+
 SHELL := /bin/bash
 RED=\033[1;31m
 GREEN=\033[1;32m
@@ -31,9 +33,8 @@ commit:
 	@git push
 
 release:
-	@RELEASE=0.0.1
 	@git add .
-	@git commit -m "release $RELEASE"
+	@git commit -m "release ${RELEASE}"
 	@git push
 	@git tag "v${RELEASE}" HEAD
 	@git tag latest HEAD

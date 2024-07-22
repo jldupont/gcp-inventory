@@ -1,7 +1,7 @@
 """
 @author: jldupont
 """
-from typing import List, Dict, Union
+from typing import List, Union
 from dataclasses import dataclass, field, asdict  # type: ignore
 from croniter import croniter  # type: ignore
 
@@ -22,23 +22,27 @@ class Service(_Base):
 
 @dataclass
 class Config(_Base):
-    Services: Dict[str, Service]
-    JobRegion: str
-    ProjectNumber: Union[int, None] = field(default=None)
-    ProjectId: str = field(default="PROJECT_NOT_SET")
-    Regions: List[str] = field(default_factory=list)
+    """
+    ProjectNumber: used along ServiceAccountEmail
+                   This parameter is inspected from the target project
+    """
+    #
+    # Used during inventory process
+    #
+    TargetLocations: str = field(default_factory=list)
+    TargetProjectId: str = field(default="PROJECT_NOT_SET")
     TargetBucket: str = field(default_factory=str)
     TargetBucketProject: str = field(default_factory=str)
+
+    #
+    # Relevant to deployment
+    #
+    ProjectId: str = field(default="PROJECT_NOT_SET")
+    JobRegion: str = field(default_factory=str)
     Schedule: str = field(default_factory=str)
+    ProjectNumber: Union[int, None] = field(default=None)
     ServiceAccountEmail: Union[str, None] = field(default=None)
 
     def __post_init__(self):
-
         if not croniter.is_valid(self.Schedule):
             raise ValueError("Invalid schedule")
-
-        services = {
-            name: Service(**attrs)
-            for name, attrs in self.Services.items()
-        }
-        self.Services = services

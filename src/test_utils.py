@@ -3,15 +3,16 @@
 """
 import pytest
 import os
-from models import Config, Service
-from utils import get_config_from_string, parse_config
+from models import Config
+from utils import get_config_from_string, parse_config, \
+    get_config_from_environment
 
 
 @pytest.fixture
 def sample_config():
     this_dir = os.path.dirname(os.path.abspath(__file__))
     tpl_dir = os.path.abspath(os.path.join(this_dir, "../templates"))
-    path_to_sample_config = os.path.join(tpl_dir, "all.yaml")
+    path_to_sample_config = os.path.join(tpl_dir, "config.yaml")
 
     with open(path_to_sample_config, "r") as f:
         return f.read()
@@ -27,20 +28,13 @@ def test_parse_config(sample_config):
     config: Config = parse_config(result)
 
     assert config.ProjectId == "PROJECT_NOT_SET"
-    assert isinstance(config.Regions, list)
-    assert len(config.Regions) == 2
-    assert isinstance(config.Services, dict)
-    assert isinstance(config.Services["BackendService"], Service)
-
-    s = config.Services["BackendService"]
-    assert s.enabled is True
+    assert isinstance(config.TargetLocations, str)
+    assert len(config.TargetLocations.split(",")) == 2
 
 
-def test_invalid_config():
-    with pytest.raises(ValueError):
-        services = {"BackendService": {"enabled": True, "extra": 666}}
+def test_config_from_environment():
 
-        Config(Services=services, JobRegion="")
+    os.environ['SCHEDULE'] = "0 */1 * * *"
 
-    with pytest.raises(ValueError):
-        Config(Services={}, Regions=None, JobRegion="")
+    c = get_config_from_environment()
+    assert c.Schedule == "0 */1 * * *"

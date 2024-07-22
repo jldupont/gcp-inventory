@@ -23,7 +23,7 @@ def run(path: str = 'config.yaml'):
 
     info("* Retrieving project description")
     project_description: ProjectDescription = \
-        cmd_retrieve_project_description()
+        cmd_retrieve_project_description(config.ProjectId)
 
     info(f"  Project number: {project_description.projectNumber}")
     config.ProjectNumber = project_description.projectNumber
@@ -32,7 +32,8 @@ def run(path: str = 'config.yaml'):
     if not check_if_bucket_exists(config):
         abort("The bucket does not exist. Please create it first")
 
-    info(f"  Bucket '{config.TargetBucket}' exists")
+    info(f"  Bucket '{config.TargetBucket}' in project "
+         f"'{config.TargetBucketProject}' exists")
 
     if config.ServiceAccountEmail is not None:
         info("* Checking if service account"

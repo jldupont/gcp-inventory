@@ -3,9 +3,9 @@
 """
 import logging
 from typing import List
-from pygcloud.core import GCloud
-from pygcloud.models import Result, OptionalParam, GCPService
-from pygcloud.gcp.models import Spec
+from pygcloud.core import GCloud  # type: ignore
+from pygcloud.models import Result, OptionalParam, GCPService  # type: ignore
+from pygcloud.gcp.models import Spec  # type: ignore
 from models import Config
 
 
@@ -15,11 +15,11 @@ info = logging.info
 
 def get_inventory(project: str,
                   service_class: GCPService,
-                  region: str = None,
+                  location: str = None,
                   exit_on_error: bool = False
                   ) -> List[Spec]:
 
-    cmd = get_cmd_list(project, service_class, region, exit_on_error)
+    cmd = get_cmd_list(project, service_class, location, exit_on_error)
     result: Result = cmd()
 
     #
@@ -29,7 +29,7 @@ def get_inventory(project: str,
     if not result.success:
         if "INVALID_ARGUMENT: Location" in result.message:
             info(f"! {service_class.__name__} does appear "
-                 f"to be available in location: {region}")
+                 f"to be available in location: {location}")
             return []
 
         error(f"Failed to list {service_class.__name__}: {result.message}")
@@ -49,7 +49,7 @@ def get_inventory(project: str,
 
 def get_cmd_list(project: str,
                  service_class: GCPService,
-                 region: str = None,
+                 location: str = None,
                  exit_on_error: bool = False
                  ) -> GCloud:
 
@@ -58,13 +58,13 @@ def get_cmd_list(project: str,
 
     where = "--region"
 
-    if region is not None:
+    if location is not None:
         if service_class.LISTING_REQUIRES_LOCATION:
             where = "--location"
 
     return GCloud(group, "list",
                   "--project", project,
-                  OptionalParam(where, region),
+                  OptionalParam(where, location),
                   "--format", "json",
                   cmd="gcloud",
                   exit_on_error=exit_on_error)
@@ -72,7 +72,7 @@ def get_cmd_list(project: str,
 
 def get_cmd_storage_bucket_describe(config: Config, bucket: str) -> GCloud:
     return GCloud("storage", "buckets", "describe", f"gs://{bucket}",
-                  "--project", config.ProjectId,
+                  "--project", config.TargetBucketProject,
                   "--format", "json",
                   cmd="gcloud",
                   exit_on_error=False,
@@ -130,7 +130,12 @@ def get_cmd_cloud_run_job_create_or_update(config: Config,
                   "--project", config.ProjectId,
                   "--region", config.JobRegion,
                   "--image", "docker.io/jldupont/gcp-inventory:latest",
-                  "--set-env-vars", "PROJECT_ID={config.ProjectId}",
+                  "--set-env-vars",
+                  f"TARGETPROJECTID={config.TargetProjectId}",
+                  "--set-env-vars", f"LOCATIONS={config.TargetLocations}",
+                  "--set-env-vars", f"TARGETBUCKET={config.TargetBucket}",
+                  "--set-env-vars",
+                  f"TARGETBUCKETPROJECT={config.TargetBucketProject}",
                   OptionalParam("--service-account",
                                 config.ServiceAccountEmail),
                   cmd="gcloud",

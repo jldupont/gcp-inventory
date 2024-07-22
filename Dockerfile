@@ -1,10 +1,11 @@
+# @author: jldupont
+#
 from google/cloud-sdk
 
 RUN pip3 install pygcloud
 
 RUN mkdir -p /app
 COPY requirements.txt /app
-COPY config.yaml /app
 COPY src/*.py /app
 RUN pip3 install -r app/requirements.txt
 
