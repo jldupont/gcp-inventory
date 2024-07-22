@@ -19,6 +19,8 @@ def run(path: str = 'config.yaml'):
     info(f"> Configuration from : {path}")
     config: Config = safe_get_config(path)
 
+    info(f"> Configuration: {config}")
+
     info(f"> Deploying to project: {config.ProjectId}")
 
     info("* Retrieving project description")
@@ -29,7 +31,7 @@ def run(path: str = 'config.yaml'):
     config.ProjectNumber = project_description.projectNumber
 
     info(f"* Checking if bucket '{config.TargetBucket}' "
-         "in project '{config.TargetBucketProject}' exists")
+         f"in project '{config.TargetBucketProject}' exists")
     if not check_if_bucket_exists(config):
         abort("The bucket does not exist. Please create it first")
 

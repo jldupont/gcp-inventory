@@ -1,7 +1,7 @@
 #
 # @author: jldupont
 #
-RELEASE=0.0.4
+RELEASE=0.0.5
 
 SHELL := /bin/bash
 RED=\033[1;31m
