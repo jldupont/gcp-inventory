@@ -37,7 +37,6 @@ release:
 	@git commit -m "release ${RELEASE}"
 	@git push
 	@git tag "v${RELEASE}" HEAD
-	@git tag latest HEAD
 	@git push --tags
 
 push:
