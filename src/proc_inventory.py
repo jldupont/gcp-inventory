@@ -37,7 +37,7 @@ def list_with_locations(project: str,
 
     all_entries: List[Spec] = []
 
-    location_list: List[str] = locations.split(",")
+    location_list: List[str] = locations.split(";")
     location: str
 
     for location in location_list:
@@ -71,7 +71,7 @@ def run(path: str = 'config.yaml'):
 
     bucket = config.TargetBucket
     bucket_project = config.TargetBucketProject
-    locations: List[str] = config.TargetLocations
+    locations: str = config.TargetLocations
 
     info(f"> Inventoring project: {config.TargetProjectId}")
     info(f"> Bucket: gs://{bucket} in project '{bucket_project}'")

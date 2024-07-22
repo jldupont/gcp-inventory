@@ -44,5 +44,7 @@ class Config(_Base):
     ServiceAccountEmail: Union[str, None] = field(default=None)
 
     def __post_init__(self):
+        if self.Schedule is None:
+            return
         if not croniter.is_valid(self.Schedule):
             raise ValueError("Invalid schedule")

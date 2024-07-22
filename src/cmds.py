@@ -131,16 +131,15 @@ def get_cmd_cloud_run_job_create_or_update(config: Config,
                   "--region", config.JobRegion,
                   "--image", "docker.io/jldupont/gcp-inventory:latest",
                   "--set-env-vars",
-                  f"TARGETPROJECTID={config.TargetProjectId}",
-                  "--set-env-vars", f"LOCATIONS={config.TargetLocations}",
-                  "--set-env-vars", f"TARGETBUCKET={config.TargetBucket}",
-                  "--set-env-vars",
+                  f"TARGETPROJECTID={config.TargetProjectId},"
+                  f"TARGETLOCATIONS={config.TargetLocations},"
+                  f"TARGETBUCKET={config.TargetBucket},"
                   f"TARGETBUCKETPROJECT={config.TargetBucketProject}",
                   OptionalParam("--service-account",
                                 config.ServiceAccountEmail),
                   cmd="gcloud",
                   exit_on_error=False,
-                  log_error=False)
+                  log_error=True)
 
 
 def deploy_cloud_run_job(config: Config, already_exists: bool) -> Result:

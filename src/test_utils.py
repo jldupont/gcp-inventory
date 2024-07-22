@@ -29,7 +29,7 @@ def test_parse_config(sample_config):
 
     assert config.ProjectId == "PROJECT_NOT_SET"
     assert isinstance(config.TargetLocations, str)
-    assert len(config.TargetLocations.split(",")) == 2
+    assert len(config.TargetLocations.split(";")) == 2
 
 
 def test_config_from_environment():
