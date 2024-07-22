@@ -30,7 +30,7 @@ def store_spec_list(config: Config,
                     service_class_name: str,
                     specs: List[Spec]):
 
-    base_path = f"{config.ProjectId}/{ts}"
+    base_path = f"{config.TargetProjectId}/{ts}"
     path = f"{TEMPDIR}/{base_path}/{service_class_name}.json"
     liste: str = spec_list_to_json(specs)
 
@@ -44,7 +44,7 @@ def store_spec_list(config: Config,
 
 def store_config(config: Config, ts: str):
 
-    base_path = f"{config.ProjectId}/{ts}"
+    base_path = f"{config.TargetProjectId}/{ts}"
     path = f"{TEMPDIR}/{base_path}/config.json"
     obj_str: str = config.to_json()
 

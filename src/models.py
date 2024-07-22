@@ -1,7 +1,7 @@
 """
 @author: jldupont
 """
-from typing import List, Union
+from typing import Union
 from dataclasses import dataclass, field, asdict  # type: ignore
 from croniter import croniter  # type: ignore
 
