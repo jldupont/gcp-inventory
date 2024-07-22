@@ -30,5 +30,14 @@ commit:
 	@git commit -m "step"
 	@git push
 
+release:
+	@RELEASE=0.0.1
+	@git add .
+	@git commit -m "release $RELEASE"
+	@git push
+	@git tag "v${RELEASE}" HEAD
+	@git tag latest HEAD
+	@git push --tags
+
 push:
 	@git push

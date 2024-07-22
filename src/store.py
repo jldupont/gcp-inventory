@@ -8,8 +8,8 @@ gcloud storage cp OBJECT_LOCATION gs://DESTINATION_BUCKET_NAME
 import logging
 from typing import List
 from tempfile import mkdtemp
-from pygcloud.tools import mkdir
-from pygcloud.gcp.models import Spec
+from pygcloud.tools import mkdir  # type: ignore
+from pygcloud.gcp.models import Spec  # type: ignore
 from models import Config
 from utils import spec_list_to_json
 

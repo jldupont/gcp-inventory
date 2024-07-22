@@ -4,7 +4,7 @@ The actual task that performs the inventory of the active project
 @author: jldupont
 """
 import logging
-from typing import List
+from typing import List, Union
 from pygcloud.models import GCPService   # type: ignore
 from pygcloud.gcp.models import Spec     # type: ignore
 from pygcloud.gcp.catalog import lookup  # type: ignore
@@ -20,7 +20,7 @@ error = logging.error
 
 def get_listings(project: str,
                  service: GCPService,
-                 region: str) -> List[Spec]:
+                 region: Union[str, None] = None) -> List[Spec]:
 
     info(f"* Retrieving {service.__name__} instance(s) "
          f"from region({region or 'all'}) ...")
