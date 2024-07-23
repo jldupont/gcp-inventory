@@ -11,7 +11,7 @@ from pygcloud.gcp.catalog import \
     get_service_classes_from_services_list  # type: ignore
 from pygcloud.cmds import cmd_retrieve_enabled_services   # type: ignore
 from models import Config
-from utils import get_config_from_environment, get_now_timestamp
+from utils import get_config_from_environment, get_now_timestamp, abort
 from cmds import get_inventory, upload_path_recursive
 from store import store_spec_list, store_config, get_temp_dir
 
@@ -115,6 +115,6 @@ def run(path: str = 'config.yaml'):
                                    f"{tempdir}/{config.TargetProjectId}")
 
     if not result.success:
-        error(f"! Failed to upload files to bucket: {result.message}")
+        abort(f"! Failed to upload files to bucket: {result.message}")
 
     info("> Done")
