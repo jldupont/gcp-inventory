@@ -47,6 +47,9 @@ def get_config_from_environment():
 def get_config(path: str = None, yaml_string: str = None) -> Config:
     """
     The config should normally be located in ./config.yaml
+
+    The environment variable holding the "ProjectId" value
+    ultimately prevails if one is available.
     """
     if isinstance(yaml_string, str):
         raw_config = get_config_from_string(yaml_string)

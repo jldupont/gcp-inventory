@@ -2,7 +2,7 @@
 @author: jldupont
 """
 import logging
-from typing import List
+from typing import List, Union
 from pygcloud.core import GCloud  # type: ignore
 from pygcloud.models import Result, OptionalParam, GCPService  # type: ignore
 from pygcloud.gcp.models import Spec  # type: ignore
@@ -15,7 +15,7 @@ info = logging.info
 
 def get_inventory(project: str,
                   service_class: GCPService,
-                  location: str = None,
+                  location: Union[str, None] = None,
                   exit_on_error: bool = False
                   ) -> List[Spec]:
 
@@ -49,7 +49,7 @@ def get_inventory(project: str,
 
 def get_cmd_list(project: str,
                  service_class: GCPService,
-                 location: str = None,
+                 location: Union[str, None] = None,
                  exit_on_error: bool = False
                  ) -> GCloud:
 

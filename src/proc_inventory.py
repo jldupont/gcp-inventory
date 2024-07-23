@@ -10,10 +10,10 @@ from pygcloud.gcp.models import Spec, ServiceDescription  # type: ignore
 from pygcloud.gcp.catalog import \
     get_service_classes_from_services_list  # type: ignore
 from pygcloud.cmds import cmd_retrieve_enabled_services   # type: ignore
-from models import Config
+from models import Config, Snapshot
 from utils import get_config_from_environment, get_now_timestamp, abort
 from cmds import get_inventory, upload_path_recursive
-from store import store_spec_list, store_config, get_temp_dir
+from store import store_spec_list, store_config, get_temp_dir, store_snapshot
 
 
 debug = logging.debug
@@ -79,6 +79,8 @@ def run(path: str = 'config.yaml'):
     ts = get_now_timestamp()
     info(f"> Using the following timestamp: {ts}")
 
+    processed_service_classes: List[str] = []
+
     for service_class in services:
 
         service_class_name = service_class.__name__
@@ -98,14 +100,23 @@ def run(path: str = 'config.yaml'):
             error(f"! Failed to store spec list: {e}")
             continue
 
+        processed_service_classes.append(service_class_name)
         info(f"> Done with {service_class_name}")
 
     try:
         store_config(config, ts)
         info("> Done with config")
     except Exception as e:
-        error(f"! Failed to store config: {e}")
-        info(f"> Objects related to the timestamp({ts}) will be dangling")
+        abort(f"! Failed to store config: {e}")
+
+    snapshot: Snapshot = \
+        Snapshot(Timestamp=ts, ServiceClasses=processed_service_classes)
+
+    try:
+        store_snapshot(config, snapshot)
+        info("> Done with snapshot 'latest'")
+    except Exception as e:
+        abort(f"! Unable to create snapshot 'latest': {e}")
 
     info(f"> Uploading files to bucket: gs//{config.TargetBucket}")
 

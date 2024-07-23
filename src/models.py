@@ -1,7 +1,7 @@
 """
 @author: jldupont
 """
-from typing import Union
+from typing import Union, List
 from dataclasses import dataclass, field, asdict  # type: ignore
 from croniter import croniter  # type: ignore
 
@@ -49,3 +49,9 @@ class Config(_Base):
             return
         if not croniter.is_valid(self.Schedule):
             raise ValueError("Invalid schedule")
+
+
+@dataclass
+class Snapshot(_Base):
+    Timestamp: str = field(default_factory=str)
+    ServiceClasses: List[str] = field(default_factory=list)

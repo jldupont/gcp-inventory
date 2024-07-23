@@ -37,14 +37,13 @@ The catalog of supported services both on GCP and this project will expand over 
 * On one hand, enabling by default all supported service classes will lead to ever increasing inventory execution time
 * On the other hand, requiring explicitly configuring the target service classes goes against the essence of automation
 * There is of course the option to explicitly disable specific service classes.
-* And finally there is the option to "auto-detect" service classes that are currently used.
+* And finally there is the option to "auto-detect" service classes that are currently used. This is the option I decided to leverage.
 
 2. Listing some services requires specifying a location
 
 It is currently not possible to list the locations being used in a project at the moment.
 
 Considering the ever growing list of locations and the time it takes to list on a per service/location basis, it is more desirable to specify the location(s) in scope through configuration.
-
 
 # Usage
 
@@ -68,23 +67,26 @@ From the above, it is reasonable one would want to use `gcp-inventory` on all pr
 
 The following steps are assumed to be executed in an environment either in the target project or in one that where the target project is accessible.
 
-* Ensure the target project id is configured correctly in the environment variables (i.e. either `PROJECT_ID`, `_PROJECT_ID` or `PROJECT`)
-* Ensure that the Service Account for the Cloud Run Job exists and has sufficient rights against the list of services in scope
+* Ensure the target project id is configured correctly in the environment variables (i.e. either `PROJECT_ID`, `_PROJECT_ID`, `PROJECTID` or `PROJECT`). This parameter can also be specified in the configuration file.
+* Ensure that the Service Account for the Cloud Run Job exists and has sufficient rights against the list of services in scope. This is assuming you will not be using the default provided by GCP.
 * Ensure that said Service Account has also `list` and `create` permissions to the target bucket
+* Ensure that the target bucket exists and is accessible by the service account
 * Ensure that the file `config.yaml` in the same directory as the makefile
 * Execute `make deploy`
 
 ## Deployment dependencies
 
-1. The bucket used to receive description artifacts must exists: it will not be created during the deployment process as this would imply granting more access to the user / service account performing the deployment.
+1. The bucket used to receive description artifacts must exist: it will not be created during the deployment process as this would imply granting more access to the user / service account performing the deployment.
 
 2. The Service Account specified in the configuration file must exist and have the required permissions to all services listed in said configuration. For security reasons, the permissions granted to the service account must be limited to listing and viewing the inventory related to the services in scope.
 
-If the target GCS bucket does not exists, the script will fail.
-
 ## Update
 
-TODO
+By default, GCP mirrors the images from Docker Hub. The "latest" image from the mirror will often be out-of-sync with the one from Docker Hub.
+
+In order to retain more control over the update process, the container version can be specified in the `config.yaml` configuration file.
+
+The command `make deploy` will perform both initial creation of the deployment and also update an existing deployment.
 
 ## Configuration
 
@@ -96,8 +98,9 @@ Details of the configuration options are contained in the `config.yaml` file dir
 
 * Produce one snapshot per execution of the Cloud Run Job `gcp-inventory`
 * A `snapshot` consists of
-  * One file object signaling the end of the snapshot execution `{TIMESTAMP}_snapshot.json`
-  * One file object per service class `{SERVICE_CLASS}/{TIMESTAMP}_inventory.json`
+  * One file object signaling the end of the snapshot execution `config.json`
+  * One file object per service class `{SERVICE_CLASS}.json`
+* A "latest.json" containing the reference to the latest snapshot
 * No locking
 
 ## Organization
@@ -108,10 +111,11 @@ Organization in the GCS bucket is as follows:
 
     {PROJECT_ID}/{TIMESTAMP}/config.json
     {PROJECT_ID}/{TIMESTAMP}/{SERVICE_CLASS}.json
+    {PROJECT_ID}/latest.json
 
 The `TIMESTAMP` is obtained at the start of the inventory (aka snapshot) process. Thus, all files prefixed with the same `TIMESTAMP` are issued from the same execution of the Cloud Run Job `gcp-inventory`.
 
-The `_config.json` contains the configuration is used to perform the inventory snapshot. The availability of this file also signals the end of the snapshot process.
+The `config.json` contains the configuration is used to perform the inventory snapshot. The availability of this file also signals the end of the snapshot process.
 
 ## Timestamp
 
@@ -126,18 +130,7 @@ The format used is loosely based on ISO8601 with UTC as timezone: the "T" and "Z
 
 # Architecture
 
-In short, a script located in a Docker container executes a number of `gcloud $service list` commands in order to list the inventory of services / resources. Each entry is processed in order to remove sensitive information e.g. environment variables in Cloud Run services.
-
-## Solution
-
-The solution leverages the python package [pygcloud](https://github.com/jldupont/pygcloud/).
-
-1. The script verifies if a `configuration file` is present in the configured path
-1. For each `service`, the script verifies if a `handler` is available
-1. Each `handler`, lists the service instances in the target project in JSON representation
-1. Then the `handler` instantiates a `pygcloud` class object associated with the service instance
-1. Finally, each `pygcloud` object is written, in JSON format, to a file in the configured path
-
+In short, a script located in a Docker container executes a number of `gcloud $service list` commands in order to list the inventory of services / resources. Each entry is processed in order to remove sensitive information e.g. environment variables in Cloud Run services. This is accomplished by using `pygcloud`.
 
 # Dependencies (major ones)
 

@@ -1,7 +1,7 @@
 #
 # @author: jldupont
 #
-RELEASE=0.0.7
+RELEASE=0.0.8
 
 SHELL := /bin/bash
 RED=\033[1;31m
@@ -23,6 +23,10 @@ test:
 deploy:
 	@echo "Starting deployment of the Cloud Run Job (creation or update)"
 	@src/gcp_inventory.py deploy
+
+inventory:
+	@echo "Starting inventory process... "
+	@src/gcp_inventory.py inventory
 
 help:
 	@src/gcp_inventory.py --help
