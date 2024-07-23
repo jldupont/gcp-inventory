@@ -37,6 +37,7 @@ class Config(_Base):
     #
     # Relevant to deployment
     #
+    ContainerRelease: str = field(default="latest")
     ProjectId: str = field(default="PROJECT_NOT_SET")
     JobRegion: str = field(default_factory=str)
     Schedule: str = field(default_factory=str)
